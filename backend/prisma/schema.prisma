@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("mysql://root:yourpassword@localhost:3306/relay")
+  url      = env("DATABASE_URL")
 }
 model Subscriber {
   id         Int      @id @default(autoincrement())
