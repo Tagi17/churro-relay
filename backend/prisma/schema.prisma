@@ -12,15 +12,17 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
 model Subscriber {
   id         Int      @id @default(autoincrement())
   name       String
   dateJoined DateTime
   userId     Int
-  User       User     @relation(fields: [userId], references: [id])
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
   id          Int          @id @default(autoincrement())
+  apiKey      String?      @unique
   subscribers Subscriber[]
 }
