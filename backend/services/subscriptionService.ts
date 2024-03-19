@@ -30,12 +30,20 @@ export const getSubscriptionByUserId = async (userId: number) => {
     })
 }
 
-export const updateSubscription = (subscriptionId, updateData) => {
+export const updateSubscription = async (subscriptionId, updateData) => {
     // Connect to your database
     // Construct the SQL query to update a subscription record by subscriptionId
     // Use updateData to populate the query parameters for fields to update
     // Execute the query
     // Return the result or the updated subscription object
+
+    return await prisma.subscriber.update({
+        where: {
+            id: subscriptionId,
+        },
+        data: updateData,
+    });
+    return updateSubscription;
 }
 export const deleteSubscription = async (subscriptionId: number) => {
 
