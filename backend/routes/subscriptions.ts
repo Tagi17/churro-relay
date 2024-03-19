@@ -1,8 +1,9 @@
 //defines routes/endpoints
 
-import { createSubscription, deleteSubscription, getSubscriptionByUserId, updateSubscription } from '../services/subscriptionService';
+import { createSubscription, createUser, deleteSubscription, getSubscriptionByUserId, updateSubscription, updateUserProfile } from '../services/subscriptionService';
 
 import express from 'express';
+import { generateAndSaveApikeyForUser } from '../services/userService';
 
 const router = express.Router();
 
@@ -20,12 +21,30 @@ router.get('/userId', async (req, res) => {
         res.status(500).json({ message: 'Error fetching subscriptions '});
     }
 })
-router.post('/subscriptions', async (req, res) => {
+router.get('/protectedRoute', async (req, res) => {
+
+})
+router.post('/subscriptions', validateSubscription, async (req, res) => {
+    const errors = validateResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
         const subscription = await createSubscription(req.body);
         res.json(subscription);
     } catch (error){
     res.status(201).json({ error: "Error occured while creating subscription"});
+    }
+})
+router.post('/users', async (req, res) => {
+    try {
+        const userData = req.body;
+        const newUser = await createUser(userData);
+        const apiKey = await generateAndSaveApikeyForUser(newUser.id);
+        res.status(201).json({ userId: newUser.id, apiKey })       
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Error '})
     }
 })
 router.patch('/subscriptionId', async(req, res) => {
@@ -41,6 +60,21 @@ router.patch('/subscriptionId', async(req, res) => {
         res.status(500).json({ message: 'Error updating subscription'});
     }
     
+})
+router.patch('/users/:userId', isAuthorized, async (req, res) => {
+    try {
+        const userId = parseInt(req.params.userId);
+        if (isNaN(userId)) {
+            return res.status(400).json({ message: 'Invalidate user ID' });
+        }
+        const updateData = req.body;
+
+        const updatedUser = await updateUserProfile(userId, updateData)
+        res.body(updatedUser)
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Error updating user profile '});
+        }
 })
 router.delete('/subscriptionId', async(req, res) => {
     try {

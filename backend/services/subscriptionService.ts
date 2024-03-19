@@ -2,13 +2,11 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const checkSubscription = (userId) => {
-    // Connect to your database
-    // Construct the SQL query to insert a new record
-    // Use subscriptionData to populate the query parameters
-    // Execute the query
-    // Return the result or the created subscription object
-    
+export const createUser = async (userData) => {
+    const newUser = await prisma.user.create({
+        data: userData,
+    })
+    return newUser;
 }
 export const createSubscription = async (subscriptionData) => {
 
@@ -31,11 +29,6 @@ export const getSubscriptionByUserId = async (userId: number) => {
 }
 
 export const updateSubscription = async (subscriptionId, updateData) => {
-    // Connect to your database
-    // Construct the SQL query to update a subscription record by subscriptionId
-    // Use updateData to populate the query parameters for fields to update
-    // Execute the query
-    // Return the result or the updated subscription object
 
     return await prisma.subscriber.update({
         where: {
@@ -54,3 +47,17 @@ export const deleteSubscription = async (subscriptionId: number) => {
     })
 }
 
+export const updateUserProfile = async (userId, updateData) => {
+    return await prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: updateData,
+    })
+}
+export const getUserEthereumAddress = async (ethereumAddress) => {
+    const user = await prisma.user.findUnique({
+        where: {  ethereumAddress },
+    });
+    return user;
+}
